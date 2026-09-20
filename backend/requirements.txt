@@ -1,0 +1,9 @@
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9
+websockets>=12.0
+pydantic>=2.5.0
+numpy>=1.24.0
+# 下記はすでに環境にインストール済み:
+# qiskit>=2.0.0
+# qiskit-aer>=0.13.0
