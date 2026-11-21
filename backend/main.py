@@ -1,4 +1,4 @@
-"""
+﻿"""
 main.py — FastAPI アプリケーション エントリポイント
 
 起動コマンド:
@@ -15,11 +15,13 @@ WebSocket:
 from __future__ import annotations
 
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
+import store
 from api.routes import router as api_router
 from api.websocket import websocket_endpoint
 
@@ -42,7 +44,6 @@ async def lifespan(app: FastAPI):
     logger.info("=" * 60)
 
     # 開発用デモユーザー作成
-    import store
     alice = store.create_user("Alice")
     bob = store.create_user("Bob")
     demo_room = store.create_room([alice.user_id, bob.user_id])
@@ -86,14 +87,12 @@ app = FastAPI(
 
 # ─── CORS 設定 ────────────────────────────────────────────────────────────────
 
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS")
+allowed_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()] if allowed_origins_env else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",   # Next.js dev server
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",   # Vite dev server
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -124,7 +123,6 @@ async def ws_endpoint(websocket: WebSocket, room_id: str, user_id: str):
 @app.get("/health", tags=["system"])
 async def health_check():
     """サーバーの稼働状態確認"""
-    import store
     return {
         "status": "ok",
         "service": "quantum-chat-backend",

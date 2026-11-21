@@ -1,7 +1,10 @@
-import { QuantumStateStep, TeleportSummary } from './types';
+﻿import { QuantumStateStep, TeleportSummary } from './types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+const WS_BASE = (
+  process.env.NEXT_PUBLIC_WS_URL ||
+  API_BASE.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:')
+).replace(/\/$/, '');
 
 export interface User {
   user_id: string;
@@ -81,3 +84,4 @@ export async function sendInstantMessage(roomId: string, senderId: string, text:
 export function getWebSocketUrl(roomId: string, userId: string): string {
   return `${WS_BASE}/ws/${roomId}/${userId}`;
 }
+
